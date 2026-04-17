@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JobPilot — AI-Powered Job Application Pipeline</title>
+  <meta name="description" content="Scrape jobs, score with AI, tailor your CV, and apply smarter. Free, local, open-source." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --blue:   #1e40af;
+      --blue2:  #2563eb;
+      --blue3:  #3b82f6;
+      --light:  #eff6ff;
+      --text:   #1e293b;
+      --muted:  #64748b;
+      --border: #e2e8f0;
+      --white:  #ffffff;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+    }
+
+    a { color: var(--blue2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-brand { font-size: 1.2rem; font-weight: 700; color: var(--navy); display: flex; align-items: center; gap: 8px; }
+    .nav-links { display: flex; gap: 2rem; font-size: 0.9rem; font-weight: 500; color: var(--muted); }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--blue2); text-decoration: none; }
+    .btn-nav {
+      background: var(--blue2); color: white !important;
+      padding: 7px 18px; border-radius: 8px; font-weight: 600; font-size: 0.88rem;
+    }
+    .btn-nav:hover { background: var(--blue); text-decoration: none !important; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
+      padding: 90px 2rem 80px;
+      text-align: center;
+      color: white;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 20px;
+      padding: 5px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: .4px;
+      margin-bottom: 24px;
+      color: #93c5fd;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: #93c5fd; }
+    .hero p {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      max-width: 600px;
+      margin: 0 auto 36px;
+    }
+    .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blue3); color: white;
+      padding: 13px 28px; border-radius: 10px;
+      font-weight: 700; font-size: 1rem;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background .15s, transform .1s;
+    }
+    .btn-primary:hover { background: #2563eb; transform: translateY(-1px); text-decoration: none; color: white; }
+    .btn-ghost {
+      background: rgba(255,255,255,.1); color: white;
+      border: 1px solid rgba(255,255,255,.25);
+      padding: 13px 28px; border-radius: 10px;
+      font-weight: 600; font-size: 1rem;
+      display: inline-flex; align-items: center; gap: 8px;
+      transition: background .15s;
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.18); text-decoration: none; color: white; }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      background: var(--light);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 2rem;
+      display: flex; justify-content: center; gap: 60px; flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-val { font-size: 1.9rem; font-weight: 800; color: var(--blue); }
+    .stat-lbl { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+    /* ── SECTIONS ── */
+    section { padding: 80px 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.78rem; font-weight: 700; color: var(--blue3);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;
+    }
+    h2 {
+      font-size: clamp(1.6rem, 3vw, 2.3rem);
+      font-weight: 800; letter-spacing: -.5px;
+      color: var(--navy); margin-bottom: 14px;
+    }
+    .section-sub { font-size: 1.05rem; color: var(--muted); max-width: 580px; margin-bottom: 52px; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; }
+    .step-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; padding: 28px 24px;
+      position: relative; overflow: hidden;
+      transition: box-shadow .2s, transform .15s;
+    }
+    .step-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,.09); transform: translateY(-3px); }
+    .step-card::before {
+      content: attr(data-step);
+      position: absolute; top: 16px; right: 20px;
+      font-size: 3.5rem; font-weight: 900;
+      color: var(--blue3); opacity: .07;
+      line-height: 1;
+    }
+    .step-icon { font-size: 2rem; margin-bottom: 14px; }
+    .step-card h3 { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+    .step-card p  { font-size: 0.88rem; color: var(--muted); }
+
+    /* ── FEATURES ── */
+    .features-bg { background: var(--light); }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+    .feature {
+      background: white; border: 1px solid var(--border);
+      border-radius: 12px; padding: 24px;
+      display: flex; gap: 16px; align-items: flex-start;
+    }
+    .feature-icon {
+      background: var(--light); border-radius: 10px;
+      width: 44px; height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem;
+    }
+    .feature h3 { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 5px; }
+    .feature p  { font-size: 0.85rem; color: var(--muted); }
+
+    /* ── PIPELINE VISUAL ── */
+    .pipeline {
+      display: flex; align-items: center; justify-content: center;
+      gap: 0; flex-wrap: wrap; margin: 48px 0;
+    }
+    .pipe-step {
+      background: white; border: 2px solid var(--border);
+      border-radius: 12px; padding: 18px 22px;
+      text-align: center; min-width: 130px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .pipe-step:hover { border-color: var(--blue3); box-shadow: 0 4px 16px rgba(59,130,246,.15); }
+    .pipe-step .ps-icon { font-size: 1.8rem; margin-bottom: 6px; }
+    .pipe-step .ps-name { font-size: 0.82rem; font-weight: 700; color: var(--navy); }
+    .pipe-step .ps-sub  { font-size: 0.74rem; color: var(--muted); margin-top: 2px; }
+    .pipe-arrow {
+      color: var(--blue3); font-size: 1.4rem; font-weight: 700;
+      padding: 0 6px; flex-shrink: 0;
+    }
+
+    /* ── INSTALL ── */
+    .install-box {
+      background: var(--navy); border-radius: 16px;
+      padding: 40px 48px; color: white;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
+      align-items: center;
+    }
+    @media (max-width: 700px) { .install-box { grid-template-columns: 1fr; padding: 32px 24px; } }
+    .install-box h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+    .install-box p  { color: #94a3b8; font-size: 0.95rem; margin-bottom: 24px; }
+    pre {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 10px; padding: 18px 20px;
+      font-size: 0.88rem; color: #e2e8f0;
+      overflow-x: auto; line-height: 1.8;
+    }
+    .cmd-comment { color: #64748b; }
+    .cmd-highlight { color: #93c5fd; }
+
+    /* ── FREE TIER NOTE ── */
+    .free-banner {
+      background: linear-gradient(135deg, #065f46, #047857);
+      border-radius: 14px; padding: 32px 36px;
+      color: white; display: flex; gap: 20px; align-items: center;
+      flex-wrap: wrap;
+    }
+    .free-banner .fb-icon { font-size: 2.8rem; flex-shrink: 0; }
+    .free-banner h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 6px; }
+    .free-banner p  { color: #a7f3d0; font-size: 0.92rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--navy); color: #94a3b8;
+      padding: 40px 2rem; text-align: center;
+      font-size: 0.88rem;
+    }
+    footer .footer-brand { color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+    footer a { color: #93c5fd; }
+    footer .footer-links { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .stats-strip { gap: 32px; }
+      .pipeline { flex-direction: column; }
+      .pipe-arrow { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-brand">🚀 JobPilot</div>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="https://github.com/YOUR_USERNAME/jobpilot" class="btn-nav">⭐ GitHub</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">🆓 Free · Open Source · Runs Locally</div>
+  <h1>Job hunting on<br/><span>autopilot</span></h1>
+  <p>Scrape LinkedIn & Stepstone, score every job with Gemini AI, tailor your CV automatically — all from your desktop. Your data never leaves your machine.</p>
+  <div class="hero-ctas">
+    <a href="https://github.com/YOUR_USERNAME/jobpilot" class="btn-primary">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02.005 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.65 1.66.24 2.88.12 3.18.77.84 1.23 1.91 1.23 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12 24 5.37 18.63 0 12 0z"/></svg>
+      View on GitHub
+    </a>
+    <a href="#install" class="btn-ghost">
+      ⚡ Quick Install
+    </a>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip">
+  <div class="stat"><div class="stat-val">100%</div><div class="stat-lbl">Free to use</div></div>
+  <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Data sent to cloud</div></div>
+  <div class="stat"><div class="stat-val">6</div><div class="stat-lbl">Auto-built CV variants</div></div>
+  <div class="stat"><div class="stat-val">1500</div><div class="stat-lbl">AI calls/day (free)</div></div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-label">How it works</div>
+    <h2>From job listing to tailored CV<br/>in minutes</h2>
+    <p class="section-sub">A simple 5-step pipeline with human approval at every stage. Nothing is submitted automatically.</p>
+
+    <!-- Pipeline visual -->
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="ps-icon">🔍</div>
+        <div class="ps-name">Search</div>
+        <div class="ps-sub">Add your URLs</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">
+        <div class="ps-icon">🌐</div>
+        <div class="ps-name">Scrape</div>
+        <div class="ps-sub">Auto-collect jobs</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">
+        <div class="ps-icon">🤖</div>
+        <div class="ps-name">Score</div>
+        <div class="ps-sub">AI rates 1–10</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">
+        <div class="ps-icon">✅</div>
+        <div class="ps-name">Review</div>
+        <div class="ps-sub">You approve</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">
+        <div class="ps-icon">📄</div>
+        <div class="ps-name">CV</div>
+        <div class="ps-sub">AI tailors it</div>
+      </div>
+      <div class="pipe-arrow">›</div>
+      <div class="pipe-step">
+        <div class="ps-icon">📤</div>
+        <div class="ps-name">Apply</div>
+        <div class="ps-sub">You hit submit</div>
+      </div>
+    </div>
+
+    <div class="steps">
+      <div class="step-card" data-step="1">
+        <div class="step-icon">🔍</div>
+        <h3>Add Your Search URLs</h3>
+        <p>Paste your LinkedIn or Stepstone search URLs with your filters already set. Tag each with a role profile and language.</p>
+      </div>
+      <div class="step-card" data-step="2">
+        <div class="step-icon">🌐</div>
+        <h3>Scrape in One Click</h3>
+        <p>JobPilot opens Edge with your search tabs. Click Scrape — it collects all job listings, skipping ones you've already seen.</p>
+      </div>
+      <div class="step-card" data-step="3">
+        <div class="step-icon">🤖</div>
+        <h3>AI Scores Every Job</h3>
+        <p>Gemini reads each job description against your CV and rates match 1–10. It also detects which role profile fits best.</p>
+      </div>
+      <div class="step-card" data-step="4">
+        <div class="step-icon">✅</div>
+        <h3>You Approve or Reject</h3>
+        <p>Review scored jobs in the dashboard. Approve the ones worth applying for. Reject the rest with one click.</p>
+      </div>
+      <div class="step-card" data-step="5">
+        <div class="step-icon">📄</div>
+        <h3>AI Tailors Your CV</h3>
+        <p>For each approved job, Gemini rewrites your summary and reorders bullets to mirror the job description keywords.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-bg" id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>Everything you need,<br/>nothing you don't</h2>
+    <p class="section-sub">Built for job seekers who want speed without losing control.</p>
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <h3>AI Match Scoring</h3>
+          <p>Gemini rates every job 1–10 against your CV and explains why in 15 words. Filter low matches instantly.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📄</div>
+        <div>
+          <h3>6 Base CV Variants</h3>
+          <p>Pre-built CVs for 3 role profiles × 2 languages (EN/DE). Ready to send, tailored per profile focus.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">✍️</div>
+        <div>
+          <h3>Per-Job CV Tailoring</h3>
+          <p>AI rewrites your professional summary and reorders bullets to match each job description — no hallucination.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📁</div>
+        <div>
+          <h3>ATS-Friendly .docx Output</h3>
+          <p>Clean Word documents generated with python-docx. No LaTeX, no LibreOffice, no formatting issues.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <div>
+          <h3>100% Local & Private</h3>
+          <p>Your CV, job data, and API key stay on your machine. Nothing is stored in the cloud or sent to third parties.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🆓</div>
+        <div>
+          <h3>Free Gemini API</h3>
+          <p>Uses Gemini 2.5 Flash free tier — 1500 requests/day, no credit card needed. Enough for daily job hunting.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🌐</div>
+        <div>
+          <h3>LinkedIn & Stepstone</h3>
+          <p>Playwright-based scraper that works with your logged-in browser session. Supports both platforms out of the box.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">🏷️</div>
+        <div>
+          <h3>Role Profile Detection</h3>
+          <p>Automatically tags each job as Cybersecurity/GRC, Product Owner, or Requirements/BA — customisable to your roles.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">📜</div>
+        <div>
+          <h3>Certificate Database</h3>
+          <p>Import your certifications from PDFs. They're automatically pulled into every tailored CV, most relevant first.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FREE TIER NOTE -->
+<section>
+  <div class="container">
+    <div class="free-banner">
+      <div class="fb-icon">🆓</div>
+      <div>
+        <h3>Truly free — no credit card, no subscription, no catch</h3>
+        <p>JobPilot uses the Google Gemini API free tier. Get your key in 30 seconds at <a href="https://aistudio.google.com/app/apikey" style="color:#6ee7b7">aistudio.google.com</a>. 1500 AI calls per day — more than enough to score and tailor CVs every day. The scraping uses zero AI tokens.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL -->
+<section id="install" style="background: var(--navy); padding: 80px 2rem;">
+  <div class="container">
+    <div style="text-align:center; margin-bottom: 52px;">
+      <div class="section-label" style="color:#93c5fd">Get started</div>
+      <h2 style="color:white">Up and running in 3 minutes</h2>
+      <p style="color:#94a3b8; max-width:520px; margin: 0 auto;">Windows only (scraper uses Microsoft Edge). Python 3.11+ required.</p>
+    </div>
+    <div class="install-box">
+      <div>
+        <h3>Option A — One click</h3>
+        <p>Download the repo and double-click <strong style="color:white">run.bat</strong>. It installs all dependencies and launches the app automatically.</p>
+        <a href="https://github.com/YOUR_USERNAME/jobpilot/archive/refs/heads/main.zip" class="btn-primary" style="margin-top: 8px; display: inline-flex;">
+          ⬇ Download ZIP
+        </a>
+      </div>
+      <div>
+        <h3>Option B — Git clone</h3>
+        <p>Clone the repo and run the setup commands below.</p>
+        <pre><span class="cmd-comment"># Clone</span>
+git clone https://github.com/<span class="cmd-highlight">YOUR_USERNAME</span>/jobpilot.git
+cd jobpilot
+
+<span class="cmd-comment"># Install deps</span>
+pip install -r requirements.txt
+playwright install chromium
+
+<span class="cmd-comment"># Configure your CV</span>
+cp master_cv.example.md master_cv.md
+
+<span class="cmd-comment"># Launch</span>
+streamlit run app.py</pre>
+      </div>
+    </div>
+    <p style="text-align:center; color:#64748b; margin-top: 28px; font-size:0.88rem;">
+      Then open <strong style="color:#94a3b8">⚙️ Settings</strong> in the app to paste your Gemini API key.
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">🚀 JobPilot</div>
+  <p>AI-powered job application pipeline — free, local, open-source.</p>
+  <div class="footer-links">
+    <a href="https://github.com/YOUR_USERNAME/jobpilot">GitHub</a>
+    <a href="https://github.com/YOUR_USERNAME/jobpilot/issues">Report a Bug</a>
+    <a href="https://aistudio.google.com/app/apikey">Get Gemini API Key</a>
+    <a href="https://github.com/YOUR_USERNAME/jobpilot/blob/main/README.md">Docs</a>
+  </div>
+  <p style="margin-top: 16px; font-size: 0.8rem;">MIT License · Built with Streamlit, Playwright & Google Gemini</p>
+</footer>
+
+</body>
+</html>
