@@ -25,7 +25,7 @@ JobPilot is a local desktop tool that automates the boring parts of job hunting:
 
 ## Features
 
-- **AI job scoring** — match score 1–10 + role profile detection (Cybersec / PO / BA)
+- **AI job scoring** — match score 1–10 + role profile detection (e.g. Cybersec / PO / BA)
 - **6 base CVs** — pre-built for 3 role profiles × 2 languages (EN/DE), ready to send
 - **Per-job CV tailoring** — Gemini rewrites your CV specifically for each job's JD
 - **ATS-friendly .docx output** — clean Word doc, no LaTeX, no LibreOffice
