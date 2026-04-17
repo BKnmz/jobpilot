@@ -49,7 +49,7 @@ JobPilot is a local desktop tool that automates the boring parts of job hunting:
 ### 1. Clone & install
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/jobpilot.git
+git clone https://github.com/BKnmz/jobpilot.git
 cd jobpilot
 pip install -r requirements.txt
 playwright install chromium
