@@ -56,7 +56,7 @@ LANGUAGES: dict[str, Language] = {
         cv_rules=(
             "Schreibe vollständig auf Deutsch, mit korrekten Umlauten und ß. "
             "Fachbegriffe, die im Deutschen üblicherweise auf Englisch verwendet werden "
-            "(z. B. Product Owner, Scrum, Roadmap, Compliance), bleiben auf Englisch. "
+            "(z. B. Software, Marketing, Know-how, Team Lead), bleiben auf Englisch. "
             "Kein Foto, kein Geburtsdatum, kein Familienstand. "
             "Stichpunkte im Nominalstil oder mit Verb am Anfang, ohne 'ich'."
         ),
@@ -79,7 +79,7 @@ LANGUAGES: dict[str, Language] = {
         },
         cv_rules=(
             "Tamamen Türkçe yaz; Türkçe karakterleri (ç, ğ, ı, İ, ö, ş, ü) doğru kullan. "
-            "Türkçede İngilizce kullanılan teknik terimler (ör. Product Owner, Scrum, "
+            "Türkçede İngilizce kullanılan teknik terimler (ör. Software, Marketing, "
             "Roadmap) İngilizce kalsın. Fotoğraf, doğum tarihi, medeni durum, T.C. kimlik "
             "numarası ve askerlik bilgisi ekleme. Maddelerde 'ben' kullanma; kısa, "
             "sonuç odaklı ifadeler yaz."

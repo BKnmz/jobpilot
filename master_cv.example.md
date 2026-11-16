@@ -1,59 +1,51 @@
 # Alex Demo
 
-Munich, Germany | +49 151 000 0000 | alex.demo@email.com | linkedin.com/in/alexdemo
+Hamburg, Germany | +49 151 000 0000 | alex.demo@example.com | linkedin.com/in/alexdemo
 
 ## Professional Summary
 
-Results-driven professional with 8+ years of experience spanning automotive cybersecurity, product ownership, and requirements engineering. Proven track record delivering regulatory-compliant systems under ISO 21434, managing cross-functional agile teams, and driving product roadmaps from concept to launch. Passionate about AI governance and digital transformation in regulated industries.
+Supply chain and operations analyst with 7 years of experience in logistics and retail. Builds reporting that teams actually use, finds the cause behind delays and stock problems, and turns it into simple process changes. Comfortable between warehouse floor, finance and IT.
 
 ## Professional Experience
 
-**AutoTech GmbH** · Munich, Germany
-*Senior Product Owner / Cybersecurity Consultant* · Jan 2021 – Present
-- Owned end-to-end product roadmap for a connected vehicle security platform, aligning 4 cross-functional teams across DE and US sites
-- Led CSMS implementation per ISO 21434 and UN R155, reducing audit findings by 60% ahead of type approval
-- Defined and prioritised backlog of 200+ user stories in Jira/Codebeamer; achieved 95% sprint delivery rate over 18 months
-- Built AI governance framework for in-vehicle ML model validation, accepted as internal standard across 3 product lines
-- Facilitated SAFe PI planning sessions for 80+ engineers, cutting inter-team dependencies by 35%
-- Conducted risk assessments (TARA) for OEM suppliers; authored 12 CSMS audit reports with zero critical findings
+**Nordhafen Logistik GmbH** · Hamburg, Germany
+*Supply Chain Analyst* · Mar 2021 – Present
+- Built a Power BI dashboard for 3 warehouses that replaced 12 weekly Excel reports and is used daily by 40 people
+- Reduced late outbound shipments from 9% to 4% within 8 months by analysing picking data in SQL and changing wave planning
+- Led the inventory clean-up before the SAP S/4HANA migration; 18,000 material records checked, 2,300 duplicates removed
+- Introduced a weekly demand forecast for the top 200 items, cutting emergency transport costs by about 15%
+- Trained 25 shift leads on the new reports and wrote a short guide for new colleagues
 
-**Digital Mobility AG** · Stuttgart, Germany
-*Requirements Engineer / Business Analyst* · Mar 2018 – Dec 2020
-- Elicited and managed 1,500+ system requirements in Codebeamer ALM, maintaining full ASPICE SWE.1 traceability
-- Bridged OEM and Tier-1 supplier communication, reducing rework by 40% through structured change control
-- Implemented ISMS controls aligned to ISO 27001 for connected services division
-- Delivered business analysis for telematics product launch; defined KPIs adopted by C-level stakeholders
-- Authored FMEA, DFD, and SysML diagrams for safety-critical ECU software modules
-- Coached 6 junior engineers in requirements best practices and ALM tooling
+**Elbe Retail AG** · Hamburg, Germany
+*Operations Analyst* · Jan 2018 – Feb 2021
+- Analysed store replenishment for 60 stores and reduced out-of-stock rates on core products by 30%
+- Automated the monthly supplier performance report with SQL and Excel Power Query, saving 2 working days a month
+- Coordinated a pilot for electronic shelf labels in 5 stores with IT, store managers and the supplier
+- Prepared cost analyses for the logistics budget together with the controlling team
 
-**StartupHub Berlin** · Berlin, Germany
-*Agile Product Manager* · Jun 2016 – Feb 2018
-- Launched SaaS B2B analytics platform from 0 to 5,000 users within 12 months as sole Product Owner
-- Wrote and prioritised 300+ user stories; ran 2-week sprints with a team of 8 engineers and 2 designers
-- Integrated AI-powered anomaly detection feature that increased customer retention by 22%
-- Managed stakeholder alignment across sales, engineering, and C-suite for quarterly roadmap reviews
+**Freight forwarding company (internship)** · Bremen, Germany
+*Logistics Intern* · Jul 2017 – Dec 2017
+- Supported customs paperwork and shipment tracking for sea freight
+- Cleaned and structured the customer master data in the TMS
 
 ## Education & Professional Development
 
-- M.Sc. Electrical Engineering & IT, Technical University Munich, 2016
-- B.Sc. Computer Engineering, RWTH Aachen University, 2014
+- M.Sc. Logistics and Supply Chain Management, Kühne Logistics University, Hamburg, 2017
+- B.Sc. Business Administration, University of Bremen, 2015
 
 ## Certifications
 
-- Certified Information Systems Security Professional (CISSP) — ISC2 (2023)
-- SAFe 6.0 Product Owner/Product Manager — Scaled Agile (2022)
-- ISO 21434 Road Vehicle Cybersecurity — TÜV Rheinland (2022)
-- IREB Certified Professional for Requirements Engineering (CPRE) — IREB (2021)
-- AWS Certified Solutions Architect Associate — Amazon Web Services (2020)
+- Microsoft Certified: Power BI Data Analyst Associate — Microsoft (2023)
+- APICS Certified Supply Chain Professional (CSCP) — ASCM (2022)
+- SAP S/4HANA Sourcing and Procurement (online course) — SAP Learning (2021)
 
 ## Technical Skills
 
-**Governance & Compliance:** ISO 21434, UN R155, ISO 27001, ASPICE, GDPR, AI Act
-**Engineering & ALM:** Codebeamer, Jira, Confluence, DOORS, SysML, FMEA, TARA
-**Agile & Product:** SAFe, Scrum, Kanban, Roadmapping, OKR, MVP definition
-**AI & Data:** Python, ML model governance, LLM integration, Power BI, SQL
-**Security:** CSMS, ISMS, penetration testing basics, threat modelling, STRIDE
+**Analytics & Reporting:** Power BI, SQL, Excel (Power Query, pivot tables), basic Python
+**Systems:** SAP S/4HANA (MM, SD), warehouse management systems, TMS
+**Supply Chain:** demand forecasting, inventory management, replenishment, KPI design
+**Ways of working:** process mapping, workshops with operations teams, documentation
 
 ## Languages
 
-German (Fluent) | English (Native) | Turkish (Conversational)
+German (Native) | English (Fluent) | Turkish (Basic)

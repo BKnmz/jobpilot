@@ -65,6 +65,20 @@ def fake_llm():
 
 
 @pytest.fixture
+def profiles():
+    """Two neutral role profiles, created the way a user would (JobPilot ships none)."""
+    first = db.save_role_profile(
+        name="Supply Chain Analyst", keywords="supply chain, logistics, SAP, forecasting",
+        headline="Supply Chain Analyst | Logistics", focus="Lead with logistics analytics.",
+        cert_tags="data, logistics")
+    second = db.save_role_profile(
+        name="Operations Analyst", keywords="operations, reporting, Power BI, SQL",
+        headline="Operations Analyst | Reporting", focus="Lead with reporting and dashboards.",
+        cert_tags="data, analytics")
+    return [db.get_role_profile(first), db.get_role_profile(second)]
+
+
+@pytest.fixture
 def master_cv():
     text = (paths.REPO_ROOT / "master_cv.example.md").read_text(encoding="utf-8")
     paths.DEFAULT_MASTER_CV.write_text(text, encoding="utf-8")

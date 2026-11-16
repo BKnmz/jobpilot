@@ -3,7 +3,7 @@ cert_reader.py — Build the certificates database from a folder of PDFs.
 
 Filename convention: NN_CATEGORY_Cert_Name_Here.pdf
   NN        = sequential number (ignored)
-  CATEGORY  = DATA | SEC | AI | MGMT | CLOUD | ISO | PM | DEV | etc.
+  CATEGORY  = DATA | AI | CLOUD | PM | FIN | MKT | ... (any word; unknown words become a tag)
   Rest      = certificate name (underscores become spaces)
 
 Usage:
@@ -25,21 +25,33 @@ from .db import _connect, init_db
 # Category → role-tag mapping
 # ---------------------------------------------------------------------------
 
+# Broad, field-neutral families. A category not listed here becomes its own tag
+# (e.g. "LOGISTICS" -> "logistics"), so any field works without code changes.
 CATEGORY_TAGS = {
     "DATA":  "data,analytics",
-    "SEC":   "cybersec,grc,compliance",
-    "AI":    "ai,product",
-    "MGMT":  "product,agile,management",
-    "CLOUD": "cloud,engineering",
-    "ISO":   "cybersec,compliance,grc",
-    "PM":    "product,agile,management",
-    "DEV":   "engineering,data",
-    "GRC":   "cybersec,grc,compliance",
-    "CYBER": "cybersec,grc,compliance",
-    "BA":    "ba,data,analytics",
-    "AGILE": "product,agile,management",
+    "AI":    "ai,data",
     "ML":    "ai,data,analytics",
+    "CLOUD": "cloud,engineering",
+    "DEV":   "engineering,software",
+    "SEC":   "security",
+    "ISO":   "quality,standards",
+    "PM":    "project,management",
+    "MGMT":  "management",
+    "AGILE": "agile,project",
+    "BA":    "analysis,data",
+    "FIN":   "finance",
+    "MKT":   "marketing",
+    "HR":    "hr",
+    "LANG":  "language",
 }
+
+
+def tags_for_category(category: str) -> str:
+    """Tags for a certificate category; unknown categories become their own lower-case tag."""
+    category = (category or "").upper()
+    if category in CATEGORY_TAGS:
+        return CATEGORY_TAGS[category]
+    return category.lower() if category and category != "UNKNOWN" else ""
 
 # Known issuers — matched by substring in PDF text (order matters: more specific first)
 KNOWN_ISSUERS = [
@@ -204,7 +216,7 @@ def process_folder(folder: str) -> tuple[int, int]:
         year   = _extract_year(text)   if text else None
         issuer = _extract_issuer(text) if text else ""
 
-        tags = CATEGORY_TAGS.get(category, "")
+        tags = tags_for_category(category)
 
         try:
             _upsert_cert(filename, category, cert_name, issuer, year, tags)
@@ -264,7 +276,7 @@ def main():
     parser.add_argument("--drive-link", help="Google Drive public folder link")
     parser.add_argument("--list",       action="store_true", help="List all certs in DB")
     parser.add_argument("--set-tags",   nargs=2, metavar=("ID", "TAGS"),
-                        help="Manually set tags for a cert: --set-tags 3 'cybersec,grc'")
+                        help="Manually set tags for a cert: --set-tags 3 'data,analytics'")
     args = parser.parse_args()
 
     init_db()

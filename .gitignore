@@ -46,3 +46,6 @@ CLAUDE.md
 instructions_writing_prj.md
 *_private.md
 .vscode/
+
+# E2E failure screenshots
+tests/e2e/artifacts/

@@ -83,7 +83,7 @@ def render() -> None:
     heading("Approved Jobs & CVs")
     labels = profile_labels()
     if not labels:
-        st.warning("Add a role profile in Settings first.")
+        st.warning("Create your role profiles first: Settings → Role profiles. JobPilot can suggest them from your CV.")
         return
 
     role_cvs = _base_cv_section(labels)

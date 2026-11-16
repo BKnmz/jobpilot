@@ -19,8 +19,7 @@ DEFAULT_MASTER_CV = HOME / "master_cv.md"
 CV_OUT_DIR = HOME / "cv_outputs"
 BASE_CV_DIR = CV_OUT_DIR / "base"
 EDGE_PROFILE_DIR = HOME / ".edge_scraper_profile"
-ROLE_PROFILE_SEED = HOME / "profiles.seed.json"
-ROLE_PROFILE_EXAMPLE = PKG_DIR / "data" / "profiles.example.json"
+ROLE_PROFILE_SEED = HOME / "profiles.seed.json"   # optional, private: the user's own profiles
 
 
 def resolve(path: str | os.PathLike) -> Path:

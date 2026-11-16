@@ -152,11 +152,70 @@ def _profile_form(profile: dict | None) -> None:
                 st.rerun()
 
 
+def _suggest_section(expanded: bool) -> None:
+    with st.expander("✨ Suggest role profiles from my CV", expanded=expanded):
+        st.caption("JobPilot reads your master CV and proposes up to 3 kinds of job you can apply "
+                   "for. You review and edit them; nothing is saved until you click Save.")
+        cv_path = db.get_cv_path()
+        if not os.path.exists(cv_path):
+            st.warning("Add your master CV first (see Master CV above).")
+            return
+        if st.button("✨ Suggest role profiles from my CV", key="suggest_profiles", width="stretch"):
+            try:
+                with open(cv_path, encoding="utf-8") as f:
+                    cv_text = f.read()
+                with st.spinner("Reading your CV..."):
+                    st.session_state["profile_suggestions"] = llm.suggest_role_profiles(cv_text)
+                st.session_state.pop("suggest_error", None)
+            except Exception as exc:
+                st.session_state["suggest_error"] = str(exc)
+        if st.session_state.get("suggest_error"):
+            st.error(st.session_state["suggest_error"])
+
+        suggestions = st.session_state.get("profile_suggestions") or []
+        if not suggestions:
+            return
+        with st.form("profile_suggestions_form"):
+            picks = []
+            for i, s in enumerate(suggestions):
+                st.markdown(f"**Suggestion {i + 1}**")
+                keep = st.checkbox("Use this profile", value=True, key=f"sug_keep_{i}")
+                values = {
+                    "name": st.text_input("Name", s["name"], key=f"sug_name_{i}"),
+                    "keywords": st.text_input("Keywords", s["keywords"], key=f"sug_kw_{i}"),
+                    "headline": st.text_input("CV headline", s["headline"], key=f"sug_head_{i}"),
+                    "focus": st.text_area("What the CV should emphasise", s["focus"], height=90,
+                                          key=f"sug_focus_{i}"),
+                    "cert_tags": st.text_input("Certificate tags", s["cert_tags"], key=f"sug_tags_{i}"),
+                }
+                picks.append((keep, values))
+            if st.form_submit_button("💾 Save selected profiles", width="stretch"):
+                existing = {p["name"].strip().lower() for p in db.get_role_profiles(active_only=False)}
+                saved = 0
+                for keep, values in picks:
+                    name = values["name"].strip()
+                    if keep and name and name.lower() not in existing:
+                        db.save_role_profile(None, **values)
+                        existing.add(name.lower())
+                        saved += 1
+                st.session_state.pop("profile_suggestions", None)
+                st.session_state["suggest_saved"] = saved
+                st.rerun()
+
+
 def _profiles_section() -> None:
     st.markdown("#### Role profiles")
     st.caption("The kinds of job you apply for. Each one gets its own base CV per language, "
                "and the scorer sorts every job into one of them.")
-    for profile in db.get_role_profiles(active_only=False):
+    saved = st.session_state.pop("suggest_saved", None)
+    if saved is not None:
+        st.success(f"Saved {saved} role profile(s). Edit them below at any time.")
+    profiles = db.get_role_profiles(active_only=False)
+    if not profiles:
+        st.info("No role profiles yet. Let JobPilot suggest them from your master CV, "
+                "or add one by hand.")
+    _suggest_section(expanded=not profiles)
+    for profile in profiles:
         with st.expander(profile["name"]):
             _profile_form(profile)
             source = db.get_profile_cv_path(profile["id"])

@@ -40,12 +40,12 @@ def render() -> None:
 
     st.markdown("#### Add a new search")
     if not labels:
-        st.warning("Add a role profile in Settings first.")
+        st.warning("Create your role profiles first: Settings → Role profiles. JobPilot can suggest them from your CV.")
         return
 
     with st.form("add_search_form", clear_on_submit=True):
         col_a, col_b, col_c, col_d = st.columns([2, 2, 1.5, 1])
-        label_in = col_a.text_input("Label", placeholder="e.g. LinkedIn PO Germany")
+        label_in = col_a.text_input("Label", placeholder="e.g. LinkedIn Analyst Germany")
         platform_in = col_b.selectbox("Platform", ["linkedin", "stepstone"])
         role_in = col_c.selectbox("Role profile", list(labels), format_func=lambda pid: labels[pid])
         lang_in = col_d.selectbox("CV language", db.get_enabled_languages(),

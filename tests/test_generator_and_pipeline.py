@@ -75,16 +75,17 @@ def test_scoring_run_end_to_end(fake_llm, master_cv, capsys):
     assert "Top match: Product Owner at Müller's AG" in capsys.readouterr().out
 
 
-def test_base_cv_build_and_tailor(fake_llm, master_cv):
+def test_base_cv_build_and_tailor(fake_llm, master_cv, profiles):
     fake_llm.answers.append("Alex Demo\nMunich | alex@example.com\nProduct Owner\n\n## Profesyonel Özet\n\nÖzet.\n")
-    built, requested = base_cvs.build([(2, "tr")])
+    pid = profiles[0]["id"]
+    built, requested = base_cvs.build([(pid, "tr")])
     assert (built, requested) == (1, 1)
-    rec = db.get_role_cvs()[(2, "tr")]
-    assert rec["cv_path"] == "cv_outputs/base/profile_2_po_tr.docx"
+    rec = db.get_role_cvs()[(pid, "tr")]
+    assert rec["cv_path"] == f"cv_outputs/base/profile_{pid}_supply_chain_analyst_tr.docx"
     assert paths.resolve(rec["cv_path"]).exists()
 
     db.insert_job("PO / Şef", "Örnek A.Ş.", "İstanbul", "JD", "https://example.com/c",
-                  role_profile=2, language="tr")
+                  role_profile=pid, language="tr")
     job = db.get_jobs_by_status("new")[0]
     fake_llm.answers.append("Alex Demo\nMunich | alex@example.com\nProduct Owner\n\n## Profesyonel Özet\n\nUyarlanmış.\n")
     rel = tailor.tailor_job(job["id"])

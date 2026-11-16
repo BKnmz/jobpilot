@@ -45,8 +45,9 @@ def run(show_models: bool = False) -> tuple[int, int]:
                           f"missing: {', '.join(sorted(missing))}" if missing else ""))
 
     profiles = db.get_role_profiles()
-    results.append(_check("Role profiles", PASS if profiles else FAIL,
-                          ", ".join(p["name"] for p in profiles) or "none — add one in Settings"))
+    results.append(_check("Role profiles", PASS if profiles else WARN,
+                          ", ".join(p["name"] for p in profiles)
+                          or "none yet: Settings → Role profiles (can be suggested from your CV)"))
 
     results.append(_check("Searches", PASS if active_searches else WARN,
                           f"{active_searches} active" if active_searches

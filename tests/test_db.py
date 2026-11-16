@@ -3,12 +3,10 @@ import json
 from jobpilot import db, paths
 
 
-def test_fresh_database_gets_example_role_profiles():
-    profiles = db.get_role_profiles()
-    assert len(profiles) == 3
-    assert all(p["name"] and p["keywords"] and p["focus"] for p in profiles)
-    assert db.get_profile_name(profiles[0]["id"]) == profiles[0]["name"]
+def test_fresh_database_has_no_predefined_role_profiles():
+    assert db.get_role_profiles(active_only=False) == []
     assert db.get_profile_name(999) == "Profile 999"
+    assert not (paths.PKG_DIR / "data" / "profiles.example.json").exists()
 
 
 def test_user_seed_file_wins_over_examples():
@@ -24,9 +22,11 @@ def test_user_seed_file_wins_over_examples():
 def test_legacy_profile_names_survive_migration():
     with db._connect() as conn:
         conn.execute("DELETE FROM role_profiles")
+    db.set_setting("profile_1_name", "Profile 1")          # placeholder, ignored
     db.set_setting("profile_2_name", "Product Lead")
     db.init_db()
     assert db.get_profile_name(2) == "Product Lead"
+    assert [p["id"] for p in db.get_role_profiles()] == [2]
 
 
 def test_role_profile_crud():
@@ -67,10 +67,10 @@ def test_certificates_filtered_by_profile_tags():
             [("a.pdf", "Security Cert", "ISC2", 2023, "cybersec,grc"),
              ("b.pdf", "Scrum Cert", "Scrum Alliance", 2022, "product,agile"),
              ("c.pdf", "Old Cert", None, None, "cybersec")])
-    cyber = db.get_role_profiles()[0]
-    names = [c["cert_name"] for c in db.get_certs_for_role(cyber["id"])]
+    pid = db.save_role_profile(name="Security Analyst", cert_tags="cybersec, grc")
+    names = [c["cert_name"] for c in db.get_certs_for_role(pid)]
     assert "Security Cert" in names and "Scrum Cert" not in names
-    assert db.cert_lines(cyber["id"])[0] == "Security Cert — ISC2 (2023)"
+    assert db.cert_lines(pid)[0] == "Security Cert — ISC2 (2023)"
 
 
 def test_contact_details_and_languages():

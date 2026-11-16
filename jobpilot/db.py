@@ -340,20 +340,35 @@ def slugify(text: str, max_len: int = 24) -> str:
 
 
 def _seed_role_profiles(conn) -> None:
-    """Fill an empty role_profiles table from the user's seed file or the bundled examples."""
+    """Fill an empty role_profiles table, but only from what the user defined themselves.
+
+    JobPilot ships no predefined role profiles: each user creates their own, by hand or
+    with "Suggest role profiles from my CV" in Settings. Sources, in order:
+    1. HOME/profiles.seed.json (a private file the user may keep in their data folder);
+    2. profile names an older JobPilot version stored in settings (profile_1_name ...).
+    """
     if conn.execute("SELECT COUNT(*) FROM role_profiles").fetchone()[0]:
         return
-    source = paths.ROLE_PROFILE_SEED if paths.ROLE_PROFILE_SEED.exists() else paths.ROLE_PROFILE_EXAMPLE
-    try:
-        items = json.loads(source.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        items = []
 
     def _legacy(key: str) -> str:
         row = conn.execute("SELECT value FROM settings WHERE key=?", (key,)).fetchone()
         return (row["value"] or "").strip() if row else ""
 
-    for pid, item in enumerate(items, start=1):
+    items: list[dict] = []
+    if paths.ROLE_PROFILE_SEED.exists():
+        try:
+            loaded = json.loads(paths.ROLE_PROFILE_SEED.read_text(encoding="utf-8"))
+            items = [i for i in loaded if isinstance(i, dict)] if isinstance(loaded, list) else []
+        except (OSError, ValueError):
+            items = []
+    else:
+        for pid in (1, 2, 3):
+            name = _legacy(f"profile_{pid}_name")
+            if name and not re.fullmatch(r"profile\s*\d+", name, re.IGNORECASE):
+                items.append({"id": pid, "name": name})
+
+    for pos, item in enumerate(items, start=1):
+        pid = int(item.get("id") or pos)
         # Older versions stored names and CV paths for profiles 1-3 in settings.
         legacy_name = _legacy(f"profile_{pid}_name")
         if re.fullmatch(r"profile\s*\d+", legacy_name, re.IGNORECASE):
