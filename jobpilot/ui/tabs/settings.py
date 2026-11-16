@@ -4,7 +4,7 @@ import os
 import streamlit as st
 
 from ... import db, languages, llm, paths
-from ..common import heading
+from ..common import flash, heading, show_flash
 
 _CONTACT_LABELS = {
     "full_name": ("Full name", "Jane Doe"),
@@ -38,7 +38,7 @@ def _ai_section() -> None:
             if st.form_submit_button(f"💾 Save {provider.label} key", width="stretch"):
                 paths.save_env_value(provider.env_key, new_key.strip())
                 st.session_state.pop("model_list", None)
-                st.success("Key saved to the .env file in your data folder.")
+                flash("Key saved to the .env file in your data folder.", "settings")
                 st.rerun()
         if provider.name == active.name:
             if current:
@@ -69,7 +69,7 @@ def _ai_section() -> None:
             if st.form_submit_button("💾 Save models", width="stretch"):
                 for task, model in picks.items():
                     db.set_setting(f"model_{task}_{active.name}", model)
-                st.success("Models saved.")
+                flash("Models saved.", "settings")
                 st.rerun()
     shown = {task: saved[task] or "chosen automatically on first use" for task in llm.TASKS}
     st.info(f"**Writing:** `{shown['write']}`  |  **Scoring:** `{shown['score']}`\n\n"
@@ -89,7 +89,7 @@ def _contact_section() -> None:
                                                    placeholder=placeholder)
         if st.form_submit_button("💾 Save contact details", width="stretch"):
             db.set_profile_fields(values)
-            st.success("Saved.")
+            flash("Saved.", "settings")
             st.rerun()
 
 
@@ -102,7 +102,7 @@ def _cv_section() -> None:
                                  placeholder=r"e.g. C:\Users\you\Documents\my_cv.md")
         if st.form_submit_button("💾 Save path", width="stretch"):
             db.set_setting("master_cv_path", new_path.strip())
-            st.success("Path saved.")
+            flash("Path saved.", "settings")
             st.rerun()
     current = db.get_cv_path()
     if os.path.exists(current):
@@ -148,7 +148,7 @@ def _profile_form(profile: dict | None) -> None:
                 db.save_role_profile(pid, name=name, keywords=keywords, headline=headline,
                                      focus=focus, cert_tags=cert_tags, cv_path=cv_path,
                                      slug=p.get("slug", ""))
-                st.success("Saved.")
+                flash("Saved.", "settings")
                 st.rerun()
 
 
@@ -231,6 +231,7 @@ def _profiles_section() -> None:
 
 def render() -> None:
     heading("Settings")
+    show_flash("settings")
     st.caption(f"Data folder: `{paths.HOME}`")
     _ai_section()
     st.divider()
