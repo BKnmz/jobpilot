@@ -7,10 +7,10 @@ Filename convention: NN_CATEGORY_Cert_Name_Here.pdf
   Rest      = certificate name (underscores become spaces)
 
 Usage:
-    python cert_reader.py --folder certificates/        # read local PDFs
-    python cert_reader.py --drive-link <URL>            # download from Drive then read
-    python cert_reader.py --list                        # print all certs in DB
-    python cert_reader.py --set-tags <id> <tags>        # manually fix tags for a cert
+    python -m jobpilot.cert_reader --folder certificates/        # read local PDFs
+    python -m jobpilot.cert_reader --drive-link <URL>            # download from Drive then read
+    python -m jobpilot.cert_reader --list                        # print all certs in DB
+    python -m jobpilot.cert_reader --set-tags <id> <tags>        # manually fix tags for a cert
 """
 
 import argparse
@@ -18,7 +18,7 @@ import os
 import re
 import sys
 
-from db import _connect, init_db
+from .db import _connect, init_db
 
 
 # ---------------------------------------------------------------------------

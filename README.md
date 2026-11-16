@@ -1,101 +1,76 @@
 # 🚀 JobPilot — AI-Powered Job Application Pipeline
 
 > Scrape jobs → Score with AI → Tailor your CV → Apply smarter.
-> **100% free. Runs locally. Your data never leaves your machine.**
+> **Free and open source. Runs locally. Your data is never stored on third-party servers; AI features send text only to the AI provider you choose.**
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue) ![Gemini](https://img.shields.io/badge/Gemini_AI-Free_Tier-orange) ![Streamlit](https://img.shields.io/badge/UI-Streamlit-red) ![License](https://img.shields.io/badge/License-MIT-green)
+![Python](https://img.shields.io/badge/Python-3.11+-blue) ![Gemini](https://img.shields.io/badge/AI-Google_Gemini-orange) ![Streamlit](https://img.shields.io/badge/UI-Streamlit-red) ![License](https://img.shields.io/badge/License-MIT-green) [![Ko-fi](https://img.shields.io/badge/☕-Buy_me_a_coffee-ff5e5b)](https://ko-fi.com/consultbknmz)
 
 ---
 
 ## What It Does
 
-JobPilot is a local desktop tool that automates the boring parts of job hunting:
+JobPilot is a local desktop tool that takes the repetitive work out of job hunting:
 
 | Step | What happens |
 |------|-------------|
-| 🔍 **Scrape** | Opens your LinkedIn/Stepstone search in Edge, scrapes all job listings |
-| 🤖 **Score** | Gemini AI rates each job 1–10 against your CV, detects role fit |
-| ✅ **Review** | You approve or reject in a clean dashboard — nothing auto-submitted |
-| 📄 **CV Tailoring** | AI rewrites your summary & reorders bullets to match the job |
-| 📤 **Apply** | Semi-automated form filler that stops before hitting Submit |
+| 🔍 **Scrape** | Opens your LinkedIn/Stepstone searches in your own browser and reads the listings |
+| 🤖 **Score** | AI rates each job 1–10 against your CV and shows which requirements you cover and miss |
+| ✅ **Review** | You approve or reject in a dashboard — nothing is sent automatically |
+| 📄 **Tailor** | AI rewrites your summary and reorders your bullets for the job, in English, German or Turkish |
+| 📤 **Apply** | Optional form filler that stops before Submit |
 
-**Human approval at every step. No surprises.**
+**A human approves every step.**
 
 ---
 
 ## Features
 
-- **AI job scoring** — match score 1–10 + role profile detection (e.g. Cybersec / PO / BA)
-- **6 base CVs** — pre-built for 3 role profiles × 2 languages (EN/DE), ready to send
-- **Per-job CV tailoring** — Gemini rewrites your CV specifically for each job's JD
-- **ATS-friendly .docx output** — clean Word doc, no LaTeX, no LibreOffice
-- **Configurable profiles** — rename profiles, set separate CV files per profile
-- **Smart scraping** — only opens newly-added search URLs, skips already-seen jobs
-- **Certificate database** — import certs from PDFs, auto-included in CVs
-- **Free forever** — uses Gemini 2.5 Flash free tier (1500 requests/day)
+- **AI job scoring** — score 1–10, a one-line reason, matched and missing keywords
+- **Your own role profiles** — define the kinds of job you apply for; each posting is sorted into one
+- **Base CVs per role and language** — English, German and Turkish, written natively, not translated
+- **Per-job CV tailoring** — one click on an approved job, download the .docx
+- **ATS-friendly .docx output** — plain Word document, no tables or graphics
+- **Pick your model** — choose from the models your API key offers; nothing is hardcoded
+- **Certificate database** — import certificates from PDFs, the relevant ones go into each CV
+- **Extensible** — add-ons can register extra tabs and AI providers (see `jobpilot/plugins.py`)
 
 ---
 
 ## Requirements
 
 - Python 3.11+
-- Microsoft Edge (for scraping — Windows only)
-- A **free** Google Gemini API key (no credit card)
+- Microsoft Edge or Google Chrome (built and tested on Windows)
+- A Google Gemini API key ([free tier available](https://aistudio.google.com/app/apikey), no credit card)
+
+Google's free tier has per-model daily limits that change over time. If scoring stops with a quota
+message, pick another model in Settings or continue the next day.
 
 ---
 
 ## Quick Start
 
-### 1. Clone & install
+### Windows, one click
+
+Download the repo and double-click **`run.bat`**. It creates a local Python environment, installs the
+dependencies and starts the app.
+
+### Manual
 
 ```bash
 git clone https://github.com/BKnmz/jobpilot.git
 cd jobpilot
 pip install -r requirements.txt
-playwright install chromium
-```
-
-Or on Windows, just run **`run.bat`** — it installs everything automatically.
-
-### 2. Get your free Gemini API key
-
-1. Go to [aistudio.google.com/app/apikey](https://aistudio.google.com/app/apikey)
-2. Sign in with a Google account → **Create API key** (free, no credit card)
-3. Copy the key
-
-### 3. Set up your CV
-
-```bash
-cp master_cv.example.md master_cv.md
-```
-
-Open `master_cv.md` and replace the example with your own experience.
-
-### 4. Launch the app
-
-```bash
+cp master_cv.example.md master_cv.md     # then replace it with your own CV
 streamlit run app.py
 ```
 
-Or double-click **`run.bat`** on Windows.
+Then, in the app:
 
-Then:
-- Go to **⚙️ Settings** → paste your Gemini API key
-- Go to **🔍 Searches** → add your LinkedIn/Stepstone search URLs
-- Go to **🌐 Scrape** → open browser, scrape jobs
-- Go to **⭐ Review & Score** → score and approve
-- Go to **✅ Approved** → build tailored CVs
-
----
-
-## Daily Workflow
-
-```
-Searches tab  →  Add/manage your job search URLs
-Scrape tab    →  Open Browser → Ready to Scrape
-Review tab    →  Score New Jobs → Approve / Reject
-Approved tab  →  Build Base CVs → Mark as Applied
-```
+1. **⚙️ Settings** → paste your Gemini key, fill in contact details, adjust the role profiles to your field
+2. **🔍 Searches** → add your LinkedIn/Stepstone search URLs
+3. **🌐 Scrape** → open browser, log in, scrape
+4. **⭐ Review & Score** → score, then approve or reject
+5. **✅ Approved** → build base CVs, tailor per job, download
 
 ---
 
@@ -103,27 +78,40 @@ Approved tab  →  Build Base CVs → Mark as Applied
 
 ```
 jobpilot/
-├── app.py                  ← Streamlit UI (main entry point)
-├── db.py                   ← SQLite helper
-├── scraper.py              ← Playwright job scraper (no AI tokens used)
-├── llm.py                  ← Gemini AI wrapper (all AI calls)
-├── generator.py            ← Markdown → .docx CV renderer
-├── build_base_cvs.py       ← Build base CVs (called by UI)
-├── score_jobs.py           ← Score jobs (called by UI)
-├── apply.py                ← Semi-automated form filler
-├── cert_reader.py          ← Import certificates from PDFs
-├── agents/
-│   ├── job_assessor.py     ← CLI: score new jobs
-│   ├── cv_tailor.py        ← CLI: tailor CV for one job
-│   ├── cv_base_builder.py  ← CLI: build base CVs
-│   └── pipeline_tester.py  ← CLI: health check
-├── master_cv.example.md    ← CV template (copy to master_cv.md)
-├── .env.example            ← API key template (copy to .env)
-├── requirements.txt
-└── run.bat                 ← Windows one-click launcher
+├── app.py                     ← entry point (streamlit run app.py)
+├── jobpilot/
+│   ├── paths.py               ← where your data lives (JOBPILOT_HOME)
+│   ├── db.py                  ← SQLite storage and helpers
+│   ├── llm.py                 ← all AI calls, pluggable providers
+│   ├── languages.py           ← English / German / Turkish conventions
+│   ├── scraper.py             ← browser scraper (no AI calls)
+│   ├── generator.py           ← markdown → .docx
+│   ├── apply.py               ← form filler that stops before Submit
+│   ├── cert_reader.py         ← import certificates from PDFs
+│   ├── plugins.py             ← add-on hooks
+│   ├── pipeline/              ← score.py, base_cvs.py, tailor.py, health.py
+│   └── ui/                    ← Streamlit tabs
+├── agents/                    ← small command-line wrappers
+├── tests/
+├── master_cv.example.md       ← CV template (copy to master_cv.md)
+└── run.bat                    ← Windows one-click launcher
 ```
 
-`master_cv.md`, `jobs.db`, `.env`, and `cv_outputs/` are gitignored — your personal data stays local.
+`master_cv.md`, `jobs.db`, `.env` and `cv_outputs/` are gitignored. Set `JOBPILOT_HOME` to keep
+them in a different folder.
+
+---
+
+## Command Line
+
+```bash
+python -m jobpilot.pipeline.health --models     # health check, list usable models
+python -m jobpilot.pipeline.score --limit 5     # score new jobs
+python -m jobpilot.pipeline.base_cvs --profiles 1:en 2:de
+python -m jobpilot.pipeline.tailor --job-id 5 --lang tr
+python -m jobpilot.scraper --diagnose           # inspect open tabs without writing
+python -m pytest                                # run the tests
+```
 
 ---
 
@@ -135,34 +123,18 @@ jobpilot/
 | Stepstone (DE) | ✅ Supported |
 | Others | Planned |
 
----
-
-## Configuration
-
-All settings are in the **⚙️ Settings** tab in the UI — no config files to edit manually.
-
-To use a different Gemini model, set in `.env`:
-
-```
-GEMINI_MODEL=gemini-2.5-flash
-GEMINI_SCORE_MODEL=gemini-2.5-flash
-```
+JobPilot reads pages in your own logged-in browser at your pace. You are responsible for using it
+within each platform's terms of service.
 
 ---
 
-## Health Check
+## Support
 
-```bash
-python agents/pipeline_tester.py
-```
+JobPilot is free and maintained in spare time. If it saved you an evening of copy-pasting, you can
+[buy me a coffee on Ko-fi](https://ko-fi.com/consultbknmz) (card, PayPal, Apple Pay or Google Pay, no account needed). Bug reports and pull requests help just as much.
 
----
-
-## Notes
-
-- **Windows only** for scraping (uses Microsoft Edge). Linux/Mac users can adapt `EDGE_EXE` in `scraper.py`.
-- Nothing is ever submitted automatically — you always review before applying.
-- Your CV, job data, and API key stay on your local machine.
+A Pro add-on is in the works: cover letters written in your own voice, in English, German and
+Turkish, learned from texts you wrote yourself.
 
 ---
 

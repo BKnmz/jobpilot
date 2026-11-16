@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Cybersecurity / GRC",
+    "slug": "cybersec",
+    "keywords": "cybersecurity, information security, GRC, ISMS, ISO 27001, compliance, risk management, audit",
+    "headline": "Cybersecurity & GRC Professional",
+    "focus": "Lead with security, governance and compliance work. Put governance and compliance skills first. Front-load bullets about audits, risk assessments, security management systems and regulatory delivery. Summary: 2-3 sentences on security compliance and regulatory delivery.",
+    "cert_tags": "cybersec, grc, compliance"
+  },
+  {
+    "name": "Product Owner",
+    "slug": "po",
+    "keywords": "Product Owner, PO, product manager, roadmap, backlog, agile, Scrum, SAFe, MVP, stakeholder",
+    "headline": "Product Owner | Agile Product Development",
+    "focus": "Lead with product ownership. Put agile and product skills first. Front-load bullets about roadmap ownership, backlog, sprint planning, releases and measurable product outcomes. Summary: 2-3 sentences on product delivery and agile leadership.",
+    "cert_tags": "product, agile, ai"
+  },
+  {
+    "name": "Requirements / Business Analyst",
+    "slug": "ba",
+    "keywords": "requirements engineering, business analyst, BA, systems engineering, traceability, ALM, specification, process analysis",
+    "headline": "Requirements Engineer | Business Analyst",
+    "focus": "Lead with requirements engineering and business analysis. Put engineering and tooling skills first. Front-load bullets about elicitation, traceability, specifications and stakeholder alignment. Summary: 2-3 sentences on requirements quality and systems thinking.",
+    "cert_tags": "data, ba, cybersec"
+  }
+]

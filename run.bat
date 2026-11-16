@@ -1,34 +1,44 @@
 @echo off
 cd /d "%~dp0"
 
-echo === Job Pipeline ===
+echo === JobPilot ===
 echo.
 
 REM Check Python
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: Python not found. Install from https://python.org
+    echo ERROR: Python not found. Install Python 3.11 or newer from https://python.org
     pause
     exit /b 1
 )
 
-REM Install/check dependencies silently
+REM Keep dependencies in a local environment so nothing is installed system-wide
+if not exist ".venv\Scripts\python.exe" (
+    echo Creating local Python environment, first run only...
+    python -m venv .venv
+)
+
 echo Checking dependencies...
-python -m pip install -r requirements.txt -q
+".venv\Scripts\python.exe" -m pip install -r requirements.txt -q
 
 REM Check .env
 if not exist ".env" (
     echo.
-    echo WARNING: .env file not found.
-    echo Copying .env.example to .env -- add your GEMINI_API_KEY inside.
+    echo No .env file yet. Creating one -- add your Gemini API key in the Settings tab.
     copy .env.example .env >nul
 )
 
+REM Check master CV
+if not exist "master_cv.md" (
+    echo No master_cv.md yet. Copying the example -- replace it with your own CV.
+    copy master_cv.example.md master_cv.md >nul
+)
+
 echo.
-echo Starting Job Pipeline UI...
+echo Starting JobPilot...
 echo Opening: http://localhost:8501
 echo Press Ctrl+C to stop.
 echo.
 
-streamlit run app.py --server.headless true
+".venv\Scripts\python.exe" -m streamlit run app.py
 pause

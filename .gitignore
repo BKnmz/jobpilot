@@ -32,3 +32,17 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local environment and private role-profile seed
+.venv/
+profiles.seed.json
+.pytest_cache/
+
+# Project notes for Claude Code (kept private, removed from the public repo on purpose)
+claude.md
+CLAUDE.md
+
+# Personal files that must never be published
+instructions_writing_prj.md
+*_private.md
+.vscode/

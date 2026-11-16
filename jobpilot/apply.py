@@ -2,7 +2,7 @@
 apply.py — Semi-automated job application via Playwright.
 
 Usage:
-    python apply.py --job-id <ID>
+    python -m jobpilot.apply --job-id <ID>
 
 Flow:
     1. Load job + profile from jobs.db
@@ -26,17 +26,9 @@ import time
 
 from playwright.sync_api import sync_playwright, TimeoutError as PWTimeout
 
-from db import init_db, get_profile, update_status, _connect
-
-
-# ---------------------------------------------------------------------------
-# DB helpers
-# ---------------------------------------------------------------------------
-
-def _get_job(job_id: int) -> dict | None:
-    with _connect() as conn:
-        row = conn.execute("SELECT * FROM jobs WHERE id=?", (job_id,)).fetchone()
-    return dict(row) if row else None
+from . import paths
+from .db import init_db, get_profile, update_status, get_job as _get_job
+from .scraper import find_browser
 
 
 # ---------------------------------------------------------------------------
@@ -221,26 +213,23 @@ def main():
     # Check CV
     cv_path = job.get("cv_path", "")
     if not cv_path:
-        print("\nNo tailored CV found for this job.")
-        print("Run the cv-tailor agent first:")
-        print("  use cv-tailor for job id", args.job_id)
+        print("\nNo CV is attached to this job yet.")
+        print("Build a base CV or tailor one first:")
+        print(f"  python -m jobpilot.pipeline.tailor --job-id {args.job_id}")
         sys.exit(1)
 
-    cv_path = os.path.abspath(cv_path)
+    cv_path = str(paths.resolve(cv_path))
     if not os.path.isfile(cv_path):
         print(f"\nCV file not found at: {cv_path}")
-        print("Re-run the cv-tailor agent to regenerate it.")
+        print("Tailor the CV again to regenerate it.")
         sys.exit(1)
 
-    # Load profile
+    # Load contact details
     profile = get_profile()
-    missing = [k for k, v in profile.items() if not v]
+    missing = [k for k in ("full_name", "email", "phone") if not profile.get(k)]
     if missing:
-        print(f"\nWarning: Profile fields are empty: {missing}")
-        print("Update them with:")
-        for field in missing:
-            print(f"  sqlite3 jobs.db \"UPDATE profile SET field_value='YOUR_VALUE' WHERE field_name='{field}'\"")
-        print()
+        print(f"\nWarning: contact details are empty: {missing}")
+        print("Fill them in under Settings → Contact details in the app.\n")
 
     # Detect platform
     platform = _detect_platform(job["source_url"] or "")
@@ -263,8 +252,8 @@ def main():
         sys.exit(0)
 
     # LinkedIn or Stepstone — use Edge scraper profile (already logged in)
-    edge_profile = os.path.join(os.path.dirname(__file__), ".edge_scraper_profile")
-    edge_exe = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+    edge_profile = str(paths.EDGE_PROFILE_DIR)
+    edge_exe = find_browser()
 
     if not os.path.isdir(edge_profile):
         print("Edge scraper profile not found.")

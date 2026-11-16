@@ -57,26 +57,3 @@ Results-driven professional with 8+ years of experience spanning automotive cybe
 ## Languages
 
 German (Fluent) | English (Native) | Turkish (Conversational)
-
----
-<!-- TAILORING GUIDE — used by the AI agents, do not delete this section -->
-
-## TAILORING GUIDE
-
-### Profile 1 — Cybersecurity / GRC
-Headline: Automotive Cybersecurity & GRC Professional
-Summary angle: Emphasise security compliance, risk management, ISO 21434, UN R155.
-Bullet priorities: Lead with CSMS, TARA, ISO 21434 audit, GRC, ISMS achievements.
-Skills order: Governance & Compliance first, then Engineering.
-
-### Profile 2 — Product Owner / Agile
-Headline: Product Owner | Agile Product Development
-Summary angle: Emphasise product delivery, backlog ownership, agile/SAFe delivery.
-Bullet priorities: Lead with roadmap ownership, backlog, SAFe PI planning, sprint metrics.
-Skills order: Agile & Product first, then Engineering, then Governance.
-
-### Profile 3 — Requirements / Business Analyst
-Headline: Requirements Engineer | Business Analyst
-Summary angle: Emphasise requirements traceability, systems engineering, ALM tooling.
-Bullet priorities: Lead with Codebeamer, ASPICE, traceability, FMEA.
-Skills order: Engineering & ALM first, then Governance, then Agile.

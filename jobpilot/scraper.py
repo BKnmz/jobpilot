@@ -13,8 +13,9 @@ Flow:
      - Inserts new jobs into jobs.db
 
 Usage:
-    python scraper.py --open    # open the browser (Step 1)
-    python scraper.py           # scrape open tabs (Step 2)
+    python -m jobpilot.scraper --open       # open the browser (Step 1)
+    python -m jobpilot.scraper              # scrape open tabs (Step 2)
+    python -m jobpilot.scraper --diagnose   # inspect open tabs, write nothing
 """
 
 import argparse
@@ -28,14 +29,38 @@ from playwright.sync_api import sync_playwright
 
 from urllib.parse import urlparse
 
-from db import init_db, insert_job, get_active_searches, get_unopened_searches, mark_searches_opened, _connect
+from . import paths
+from .db import init_db, insert_job, get_active_searches, get_unopened_searches, mark_searches_opened, _connect
 
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
 
-EDGE_EXE         = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
-EDGE_PROFILE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".edge_scraper_profile")
+_BROWSER_CANDIDATES = [
+    r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+    r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+    r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+    "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/microsoft-edge",
+    "/usr/bin/google-chrome",
+]
+
+
+def find_browser() -> str:
+    """Path to Edge or Chrome. Set JOBPILOT_BROWSER to point at a different one."""
+    override = os.environ.get("JOBPILOT_BROWSER", "").strip()
+    if override:
+        return override
+    for candidate in _BROWSER_CANDIDATES:
+        if os.path.isfile(candidate):
+            return candidate
+    return _BROWSER_CANDIDATES[0]
+
+
+EDGE_EXE         = find_browser()
+EDGE_PROFILE_DIR = str(paths.EDGE_PROFILE_DIR)
 DEBUG_PORT       = 9222
 CDP_URL          = f"http://localhost:{DEBUG_PORT}"
 
@@ -178,6 +203,11 @@ def open_browser():
                 mark_searches_opened(opened_ids)
         except Exception as e:
             print(f"Could not open tabs: {e}")
+        return
+
+    if not os.path.isfile(EDGE_EXE):
+        print(f"Could not find Edge or Chrome at: {EDGE_EXE}")
+        print("Set the JOBPILOT_BROWSER environment variable to your browser's .exe path.")
         return
 
     os.makedirs(EDGE_PROFILE_DIR, exist_ok=True)

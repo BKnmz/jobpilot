@@ -1,8 +1,8 @@
 """
-generator.py — Converts a tailored CV markdown file into an ATS-compliant .docx
+generator.py — Converts a CV markdown file into an ATS-friendly .docx
 
 Usage:
-    python generator.py cv_outputs/company_title_tailored.md
+    python -m jobpilot.generator cv_outputs/company_title_tailored.md
 
 Output:
     cv_outputs/company_title_tailored.docx
@@ -21,22 +21,26 @@ from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 from docx.opc.constants import RELATIONSHIP_TYPE as RT
 
+from . import languages
+
 
 # ---------------------------------------------------------------------------
 # Document style setup
 # ---------------------------------------------------------------------------
 
-def _setup_document() -> Document:
+def _setup_document(margins_cm: tuple = (1.2, 1.2, 1.4, 1.4)) -> Document:
+    """New A4 document with JobPilot's styles. margins_cm = (top, bottom, left, right)."""
     doc = Document()
+    top, bottom, left, right = margins_cm
 
-    # A4 page, tight margins for 2-page fit
+    # A4 page; the default tight margins help a CV fit on two pages
     for section in doc.sections:
         section.page_width  = int(21.0 * 914400 / 2.54)
         section.page_height = int(29.7 * 914400 / 2.54)
-        section.top_margin    = Cm(1.2)
-        section.bottom_margin = Cm(1.2)
-        section.left_margin   = Cm(1.4)
-        section.right_margin  = Cm(1.4)
+        section.top_margin    = Cm(top)
+        section.bottom_margin = Cm(bottom)
+        section.left_margin   = Cm(left)
+        section.right_margin  = Cm(right)
 
     # Normal style
     normal = doc.styles["Normal"]
@@ -77,6 +81,11 @@ def _setup_document() -> Document:
     lp.paragraph_format.space_after   = Pt(1)
 
     return doc
+
+
+def new_document(margins_cm: tuple = (2.0, 2.0, 2.5, 2.0)) -> Document:
+    """Public helper for other documents (e.g. letters) that should match the CV's look."""
+    return _setup_document(margins_cm)
 
 
 def _add_bottom_border(paragraph):
@@ -185,9 +194,17 @@ def _render_contact_line(doc, contact_str):
 # Markdown parser
 # ---------------------------------------------------------------------------
 
+def _strip_md(text: str) -> str:
+    """Remove markdown heading marks and bold/italic markers from a line."""
+    text = re.sub(r'^#+\s*', '', text.strip())
+    text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)
+    text = re.sub(r'(?<![*\w])\*(?!\s)([^*]+?)(?<!\s)\*(?![*\w])', r'\1', text)
+    return text.strip()
+
+
 def _clean_name(name: str) -> str:
-    """Remove parenthetical nicknames, e.g. 'Jane (JJ) Doe' → 'Jane Doe'."""
-    return re.sub(r'\s*\([^)]*\)', '', name).strip()
+    """Remove heading marks and parenthetical nicknames: '# Jane (JJ) Doe' -> 'Jane Doe'."""
+    return re.sub(r'\s*\([^)]*\)', '', _strip_md(name)).strip()
 
 
 def _parse(text: str) -> dict:
@@ -218,9 +235,15 @@ def _parse(text: str) -> dict:
                     result["contact"] = stripped
                     header_count += 1
                 elif header_count == 2:
-                    result["headline"] = stripped
-                    header_count += 1
                     header_done = True
+                    if stripped.startswith("## "):
+                        # Some CVs write the headline as a heading. It is a headline
+                        # only if another heading follows before any body text.
+                        following = next((l.strip() for l in lines[i + 1:] if l.strip()), "")
+                        if not following.startswith("## "):
+                            continue  # a real section: parse it below, no headline
+                    result["headline"] = _strip_md(stripped)
+                    header_count += 1
             i += 1
             continue
 
@@ -268,8 +291,9 @@ def _add_section_heading(doc, title):
 def _add_experience_section(doc, lines):
     date_pattern = re.compile(
         r'\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|'
-        r'Dez|Okt|Mai|Mrz|'
-        r'\d{4}|Heute|Present)\b', re.IGNORECASE
+        r'Dez|Okt|Mai|Mrz|Mär|'
+        r'Oca|Şub|Nis|Haz|Tem|Ağu|Eyl|Eki|Kas|Ara|'
+        r'\d{4}|Heute|Present|Halen|Günümüz)\b', re.IGNORECASE
     )
 
     i = 0
@@ -283,13 +307,17 @@ def _add_experience_section(doc, lines):
         if line.startswith("- "):
             p = doc.add_paragraph(style="List Paragraph")
             p.paragraph_format.left_indent = Cm(0.4)
-            run = p.add_run("- " + line[2:])
+            run = p.add_run("- " + _strip_md(line[2:]))
             run.font.name = "Calibri"
             run.font.size = Pt(10)
             i += 1
             continue
 
+        # Accept '**Company** · City' as well as 'Company | City'
+        line = _strip_md(line).replace(" · ", " | ")
         next_line = lines[i + 1].rstrip() if i + 1 < len(lines) else ""
+        if not next_line.startswith("- "):
+            next_line = _strip_md(next_line).replace(" · ", " | ")
 
         if "|" in line and not line.startswith("- ") and (date_pattern.search(next_line) or "|" in next_line):
             # Company | Location line
@@ -401,8 +429,7 @@ def render(md_path: str) -> str:
         run.bold = True
 
     # --- Sections ---
-    experience_keys = {"professional experience", "experience", "work experience",
-                       "berufserfahrung"}
+    experience_keys = languages.experience_headings()
 
     # Detect and extract footer (last line of last section matching "City, Month Year")
     footer_text = ""
@@ -411,7 +438,7 @@ def render(md_path: str) -> str:
         non_empty = [l for l in last_sec["lines"] if l.strip()]
         if non_empty:
             candidate = non_empty[-1].strip()
-            if re.match(r'^[A-Za-zÄÖÜäöüß\s]+,\s+\w+\s+\d{4}$', candidate):
+            if re.match(r'^[A-Za-zÄÖÜäöüßÇĞİŞçğış\s]+,\s+\w+\s+\d{4}$', candidate):
                 footer_text = candidate
                 last_sec["lines"] = [l for l in last_sec["lines"]
                                      if l.strip() != candidate]
@@ -449,7 +476,7 @@ def render(md_path: str) -> str:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python generator.py <path/to/tailored_cv.md>")
+        print("Usage: python -m jobpilot.generator <path/to/cv.md>")
         sys.exit(1)
 
     try:
