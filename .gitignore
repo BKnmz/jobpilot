@@ -2,7 +2,9 @@
 .env
 
 # Claude Code session data
-.claude/
+.claude/*
+!.claude/agents/
+!.claude/skills/
 
 # User-specific data — not part of the public repo
 master_cv.md
