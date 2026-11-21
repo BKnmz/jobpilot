@@ -8,6 +8,20 @@ import streamlit as st
 
 from .. import db, paths
 
+
+def flash(message: str, scope: str) -> None:
+    """Remember a success message so it survives the st.rerun() that follows a save.
+
+    `scope` names the tab: all tabs render in one run, so each tab shows only its own messages."""
+    st.session_state.setdefault(f"_flash_{scope}", []).append(message)
+
+
+def show_flash(scope: str) -> None:
+    """Show (once) the messages stored by flash() for this scope. Call near the top of a tab."""
+    for message in st.session_state.pop(f"_flash_{scope}", []):
+        st.success(message)
+
+
 CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

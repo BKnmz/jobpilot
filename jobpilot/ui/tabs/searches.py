@@ -2,7 +2,7 @@
 import streamlit as st
 
 from ... import db, languages
-from ..common import heading, profile_labels
+from ..common import flash, heading, profile_labels, show_flash
 
 
 def render() -> None:
@@ -11,6 +11,7 @@ def render() -> None:
         "Add the search URLs you set up on LinkedIn and Stepstone. "
         "Tag each with a role profile and language so scraped jobs are categorised automatically."
     )
+    show_flash("searches")
     labels = profile_labels()
 
     searches = db.get_all_searches()
@@ -43,14 +44,17 @@ def render() -> None:
         st.warning("Create your role profiles first: Settings → Role profiles. JobPilot can suggest them from your CV.")
         return
 
-    with st.form("add_search_form", clear_on_submit=True):
+    # The form is only reset after a successful insert: bumping the counter gives it fresh widgets.
+    n = st.session_state.get("add_search_n", 0)
+    with st.form(f"add_search_form_{n}"):
         col_a, col_b, col_c, col_d = st.columns([2, 2, 1.5, 1])
-        label_in = col_a.text_input("Label", placeholder="e.g. LinkedIn Analyst Germany")
+        label_in = col_a.text_input("Label", placeholder="e.g. LinkedIn Analyst Germany", key=f"add_search_label_{n}")
         platform_in = col_b.selectbox("Platform", ["linkedin", "stepstone"])
         role_in = col_c.selectbox("Role profile", list(labels), format_func=lambda pid: labels[pid])
         lang_in = col_d.selectbox("CV language", db.get_enabled_languages(),
                                   format_func=lambda c: languages.get(c).native)
-        url_in = st.text_input("Search URL", placeholder="Paste the full search URL from your browser")
+        url_in = st.text_input("Search URL", placeholder="Paste the full search URL from your browser",
+                                   key=f"add_search_url_{n}")
         if st.form_submit_button("Add Search", width="stretch"):
             if not url_in.strip():
                 st.error("URL cannot be empty.")
@@ -61,5 +65,6 @@ def render() -> None:
             else:
                 db.insert_search(platform=platform_in, role_profile=role_in,
                                  search_url=url_in.strip(), label=label_in.strip(), language=lang_in)
-                st.success(f"Added: {label_in.strip()}")
+                flash(f"Added: {label_in.strip()}", "searches")
+                st.session_state["add_search_n"] = n + 1
                 st.rerun()
